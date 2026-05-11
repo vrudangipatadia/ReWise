@@ -1,93 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <title>Flashcard Learning App</title>
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- icons libarary -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReWise</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
 
-<div class="container">
-  <div class="header">
-    <div>
-      <h1>GradientLearn : Flashcard Learning App</h1>
-      <p>Colorful cards that boost your learning</p>
+    <div id="auth-box" class="auth-container">
+        <div class="glass-card">
+            <h2>Welcome to ReWise</h2>
+            
+            <div id="login-form">
+                <input type="text" id="l-user" placeholder="Username">
+                <input type="password" id="l-pass" placeholder="Password">
+                <button class="main-btn login-spacing" onclick="login()">Login</button>
+                <p class="auth-footer">New? <span class="link" onclick="toggleAuth()">Register</span></p>
+            </div>
+
+            <div id="reg-form" style="display:none;">
+                <input type="text" id="r-user" placeholder="Choose Username">
+                <input type="password" id="r-pass" placeholder="Choose Password">
+                <button class="main-btn login-spacing" onclick="register()">Create Account</button>
+                <p class="auth-footer">Back to <span class="link" onclick="toggleAuth()">Login</span></p>
+            </div>
+        </div>
     </div>
 
+    <main id="main-app" class="app-container" style="display:none;">
+        <header class="header">
+            <div class="profile-icon">V</div>
+            <div class="brand">
+                <h1>Re<span>Wise</span></h1>
+                <p>Learning with Flashcards</p>
+            </div>
+        </header>
 
-    <div class="counter">
-      <span class="dot"></span>
-      <span id="count">0 cards</span>
-    </div>
-  </div>
+        <div class="search-section">
+            <input type="text" id="search-bar" placeholder="Search cards...">
+        </div>
 
-  <!-- input of flashcards -->
-  <div class="input-card">
-    <input id="question" placeholder="Question" />
-    <input id="answer" placeholder="Answer" />
+        <div class="mode-selector">
+            <button id="btn-s" class="mode-btn active" onclick="setView('study')">Study mode</button>
+            <button id="btn-c" class="mode-btn" onclick="setView('create')">Create Mode</button>
+        </div>
 
-    <!-- Dropdown of color options -->
-    <select id="color">
-      <option value="emerald">Emerald</option>
-      <option value="pink">Pink</option>
-      <option value="orange">Orange</option>
-      <option value="purple">Purple</option>
-    </select>
-    <input id="tag" placeholder="Tag (optional)" />
-    <button onclick="addCard()">+ Add Card</button>
-  </div>
+        <section id="view-study">
+            <div class="grid" id="card-grid"></div>
+        </section>
 
-  <div class="grid" id="grid"></div>
+        <section id="view-create" class="hidden">
+            <div class="create-bar">
+                <input id="in-q" placeholder="Question">
+                <input id="in-a" placeholder="Answer">
+                <select id="in-c">
+                    <option value="card-green">Green</option>
+                    <option value="card-pink">Pink</option>
+                    <option value="card-red">Red</option>
+                </select>
+                <button class="add-btn" onclick="addCard()">+ Add Card</button>
+            </div>
+            <div id="card-list" class="list-view"></div>
+        </section>
+    </main>
 
-</div>
-
-<!--edit popup -->
-<div id="editModal" class="modal-overlay">
-  <div class="modal">
-
-    <div class="modal-header">
-      <div>
-        <h2>Edit Flashcard</h2>
-        <p>Update the question, answer, color, and tag for this flashcard.</p>
-      </div>
-      <button class="close-btn" onclick="closeModal()">×</button>
-    </div>
-   
-    <!-- shows the edit fields with existing inputs at start -->
-    <div class="modal-body">
-      <label>Question</label>
-      <input id="edit-question" type="text" />
-     
-      <label>Answer</label>
-      <input id="edit-answer" type="text" />
-     
-      <label>Color</label>
-      <select id="edit-color">
-        <option value="emerald">Emerald</option>
-        <option value="pink">Pink</option>
-        <option value="orange">Orange</option>
-        <option value="purple">Purple</option>
-      </select>
-     
-      <label>Tag (optional)</label>
-      <input id="edit-tag" type="text" />
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-
-      <!-- Saves chnages of the seleetcted flashcard -->
-      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
