@@ -51,13 +51,14 @@ async function loadCards() {
         const res = await fetch(`${URL}/cards`);
         const cards = await res.json();
         
-        const grid = document.getElementById('card-grid');
-        grid.innerHTML = cards.map(c => `
-            <div class="card" onclick="this.classList.toggle('flipped')">
-                <div class="face front card-${c.c}">${c.q}</div>
-                <div class="face back">${c.a}</div>
-            </div>
-        `).join('');
+        // 1. Render Study Mode Grid
+const grid = document.getElementById('card-grid');
+grid.innerHTML = cards.map(c => `
+    <div class="card card-${c.c}" onclick="this.classList.toggle('flipped')">
+        <div class="face front">${c.q}</div>
+        <div class="face back"><span>${c.a}</span></div>
+    </div>
+`).join('');
 
         const list = document.getElementById('card-list');
         list.innerHTML = cards.map(c => `
