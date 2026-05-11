@@ -1,4 +1,6 @@
 const URL = 'http://localhost:3000/api';
+let editingId = null;
+let deletingId = null;
 
 function toggleAuth() {
     const isLoginVisible = document.getElementById('login-form').style.display !== 'none';
@@ -9,48 +11,31 @@ function toggleAuth() {
 async function login() {
     const username = document.getElementById('l-user').value;
     const password = document.getElementById('l-pass').value;
-    
     try {
         const res = await fetch(`${URL}/login`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username, password })
         });
-        
         if (res.ok) {
             document.getElementById('auth-box').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             loadCards();
-        } else {
-            const data = await res.json();
-            alert(data.message || "Invalid Credentials");
-        }
-    } catch (e) {
-        alert("Server error. Ensure node server.js is running.");
-    }
+        } else { alert("Login failed."); }
+    } catch (e) { alert("Server not responding."); }
 }
 
 async function register() {
     const username = document.getElementById('r-user').value;
     const password = document.getElementById('r-pass').value;
-    
     try {
         const res = await fetch(`${URL}/register`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username, password })
         });
-        
-        if (res.ok) {
-            alert("Success! Now log in.");
-            toggleAuth();
-        } else {
-            const data = await res.json();
-            alert(data.message || "Registration failed");
-        }
-    } catch (e) {
-        alert("Server error.");
-    }
+        if (res.ok) { alert("Success! Log in now."); toggleAuth(); }
+    } catch (e) { alert("Registration failed."); }
 }
 
 function setView(mode) {
@@ -58,20 +43,35 @@ function setView(mode) {
     document.getElementById('view-create').classList.toggle('hidden', mode !== 'create');
     document.getElementById('btn-s').classList.toggle('active', mode === 'study');
     document.getElementById('btn-c').classList.toggle('active', mode === 'create');
+    loadCards();
 }
 
 async function loadCards() {
     try {
         const res = await fetch(`${URL}/cards`);
         const cards = await res.json();
+        
         const grid = document.getElementById('card-grid');
         grid.innerHTML = cards.map(c => `
             <div class="card" onclick="this.classList.toggle('flipped')">
-                <div class="face front ${c.c}">${c.q}</div>
+                <div class="face front card-${c.c}">${c.q}</div>
                 <div class="face back">${c.a}</div>
             </div>
         `).join('');
-    } catch (e) { console.log("Cards load failed"); }
+
+        const list = document.getElementById('card-list');
+        list.innerHTML = cards.map(c => `
+            <div class="list-row">
+                <div class="row-item">Question: ${c.q}</div>
+                <div class="row-item">Answer: ${c.a}</div>
+                <div class="row-item"><span class="dot dot-${c.c}"></span>${c.t || 'General'}</div>
+                <div class="row-item">
+                    <i class="fa-regular fa-pen-to-square edit-icon" onclick="openEdit('${c._id}', '${c.q}', '${c.a}', '${c.t}')"></i>
+                    <i class="fa-solid fa-trash delete-icon" onclick="openDelete('${c._id}')"></i>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) { console.error(e); }
 }
 
 async function addCard() {
