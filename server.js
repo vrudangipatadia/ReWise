@@ -18,7 +18,8 @@ const cardSchema = new mongoose.Schema({
     q: String,
     a: String,
     c: String,
-    t: String
+    t: String,
+    user: String
 });
 
 const Card = mongoose.model('Card', cardSchema);
@@ -47,30 +48,29 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
 
     const user = await User.findOne(req.body);
-
-    if (user) {
-        res.json({ success: true });
-    } else {
-        res.status(401).json({ message: 'Fail' });
-    }
+    // Return the username so the frontend knows who logged in
+    user ? res.json({ success: true, username: user.username }) : res.status(401).json({ message: "Fail" });
 });
 
 // `=================` CARD ROUTES =================
 
-// GET ALL
+// GET ALL (Filtered by User)
 app.get('/api/cards', async (req, res) => {
+    const { user } = req.query; 
+    
+    if (!user) {
+        return res.json([]); // Return empty if no user is logged in
+    }
 
-    const cards = await Card.find();
-    res.json(cards);
+    // Only finds cards where the 'user' field matches the logged-in username
+    const userCards = await Card.find({ user: user }); 
+    res.json(userCards);
 });
 
 // CREATE
 app.post('/api/cards', async (req, res) => {
-
-    const card = new Card(req.body);
-    await card.save();
-
-    res.status(201).json(card);
+    const cardData = { ...req.body }; 
+    res.status(201).json(await new Card(cardData).save());
 });
 
 // UPDATE

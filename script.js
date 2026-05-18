@@ -1,6 +1,7 @@
 const URL = 'http://localhost:3000/api';
 let editingId = null;
 let deletingId = null;
+let currentUser = null;
 
 function toggleAuth() {
     const isLoginVisible = document.getElementById('login-form').style.display !== 'none';
@@ -17,10 +18,14 @@ async function login() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username, password })
         });
+        
+        const data = await res.json(); // <--- Get the response data
+
         if (res.ok) {
+            currentUser = data.username; // <--- USERNAME STORED HERE
             document.getElementById('auth-box').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
-            loadCards();
+            loadCards(); // Now this will only load YOUR cards
         } else { alert("Login failed."); }
     } catch (e) { alert("Server not responding."); }
 }
@@ -48,17 +53,17 @@ function setView(mode) {
 
 async function loadCards() {
     try {
-        const res = await fetch(`${URL}/cards`);
+        // FIXED: Added ?user=${currentUser} to the fetch URL
+        const res = await fetch(`${URL}/cards?user=${currentUser}`);
         const cards = await res.json();
         
-        // 1. Render Study Mode Grid
-const grid = document.getElementById('card-grid');
-grid.innerHTML = cards.map(c => `
-    <div class="card card-${c.c}" onclick="this.classList.toggle('flipped')">
-        <div class="face front">${c.q}</div>
-        <div class="face back"><span>${c.a}</span></div>
-    </div>
-`).join('');
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = cards.map(c => `
+            <div class="card card-${c.c}" onclick="this.classList.toggle('flipped')">
+                <div class="face front">${c.q}</div>
+                <div class="face back"><span>${c.a}</span></div>
+            </div>
+        `).join('');
 
         const list = document.getElementById('card-list');
         list.innerHTML = cards.map(c => `
@@ -80,15 +85,22 @@ async function addCard() {
     const a = document.getElementById('in-a').value;
     const c = document.getElementById('in-c').value;
     const t = document.getElementById('in-t').value;
+    
     if (!q || !a) return alert("Fill in fields");
+
+    // Adding user: currentUser 
     await fetch(`${URL}/cards`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ q, a, c, t })
+        body: JSON.stringify({ q, a, c, t, user: currentUser }) 
     });
+
     loadCards();
+    
+    // Clear inputs
     document.getElementById('in-q').value = '';
     document.getElementById('in-a').value = '';
+    document.getElementById('in-t').value = '';
 }
 
 function openEdit(id, q, a, t) {
