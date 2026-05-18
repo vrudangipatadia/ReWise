@@ -2,6 +2,7 @@ console.log("SERVER FILE LOADED ✔️");
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -36,20 +37,41 @@ const User = mongoose.model('User', userSchema);
 
 app.post('/api/register', async (req, res) => {
     try {
-        const user = new User(req.body);
+        const { username, password } = req.body;
+        
+        // Generate salt and hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const user = new User({
+            username: username,
+            password: hashedPassword // Saves the hash, not the password
+        });
+
         await user.save();
         res.status(201).json({ message: 'Registered' });
-
     } catch (e) {
-        res.status(400).json({ message: 'User exists' });
+        res.status(400).json({ message: 'User exists or error occurred' });
     }
 });
 
 app.post('/api/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
 
-    const user = await User.findOne(req.body);
-    // Return the username so the frontend knows who logged in
-    user ? res.json({ success: true, username: user.username }) : res.status(401).json({ message: "Fail" });
+        if (user) {
+            // Compare the plain text password from the user with the hash in the DB
+            const isMatch = await bcrypt.compare(password, user.password);
+            
+            if (isMatch) {
+                return res.json({ success: true, username: user.username });
+            }
+        }
+        
+        res.status(401).json({ message: "Fail" });
+    } catch (e) {
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 // `=================` CARD ROUTES =================
