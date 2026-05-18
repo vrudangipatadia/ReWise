@@ -20,7 +20,21 @@ body {
 
 /* APP LAYOUT */
 .app-container { width: 98%; max-width: 1400px; padding: 40px 20px; }
-.header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+.header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; position: relative; }
+
+.user-profile { position: relative; z-index: 10; cursor: pointer; display: inline-block; }
+
+.user-initial { width: 40px; height: 40px; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+
+.user-initial:hover { transform: scale(1.05); }
+
+.logout-dropdown { position: absolute; top: 50px; left: 0; background: white; border: 1px solid #ddd; padding: 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 150px; }
+
+.logout-dropdown p { margin: 0 0 8px 0; font-size: 0.9rem; color: #444; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+
+.logout-dropdown button { width: 100%; background: #ff4757; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; }
+
+.hidden { display: none !important; }
 .profile-icon { width: 50px; height: 50px; background: #be185d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 .brand h1 span { color: #ec4899; }
 

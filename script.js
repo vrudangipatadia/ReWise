@@ -19,13 +19,21 @@ async function login() {
             body: JSON.stringify({ username, password })
         });
         
-        const data = await res.json(); // <--- Get the response data
+        const data = await res.json();
 
         if (res.ok) {
-            currentUser = data.username; // <--- USERNAME STORED HERE
+            currentUser = data.username; 
+
+            // --- UPDATED: Update UI with User Info ---
+            const initialEl = document.getElementById('user-initial');
+            const nameEl = document.getElementById('full-username');
+            
+            if (initialEl) initialEl.innerText = currentUser.charAt(0).toUpperCase();
+            if (nameEl) nameEl.innerText = currentUser;
+
             document.getElementById('auth-box').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
-            loadCards(); // Now this will only load YOUR cards
+            loadCards(); 
         } else { alert("Login failed."); }
     } catch (e) { alert("Server not responding."); }
 }
@@ -43,6 +51,25 @@ async function register() {
     } catch (e) { alert("Registration failed."); }
 }
 
+// --- NEW: Toggle the Dropdown Menu ---
+function toggleLogoutMenu() {
+    const menu = document.getElementById('logout-menu');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+}
+
+function logout() {
+    currentUser = null;
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('auth-box').style.display = 'block';
+    
+    // Reset UI state
+    document.getElementById('l-pass').value = '';
+    const menu = document.getElementById('logout-menu');
+    if (menu) menu.classList.add('hidden');
+}
+
 function setView(mode) {
     document.getElementById('view-study').classList.toggle('hidden', mode !== 'study');
     document.getElementById('view-create').classList.toggle('hidden', mode !== 'create');
@@ -53,7 +80,6 @@ function setView(mode) {
 
 async function loadCards() {
     try {
-        // FIXED: Added ?user=${currentUser} to the fetch URL
         const res = await fetch(`${URL}/cards?user=${currentUser}`);
         const cards = await res.json();
         
@@ -88,7 +114,6 @@ async function addCard() {
     
     if (!q || !a) return alert("Fill in fields");
 
-    // Adding user: currentUser 
     await fetch(`${URL}/cards`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -97,7 +122,6 @@ async function addCard() {
 
     loadCards();
     
-    // Clear inputs
     document.getElementById('in-q').value = '';
     document.getElementById('in-a').value = '';
     document.getElementById('in-t').value = '';

@@ -27,14 +27,24 @@
         </div>
     </div>
 
-    <main id="main-app" class="app-container" style="display:none;">
-        <header class="header">
-            <div class="profile-icon">V</div>
-            <div class="brand">
-                <h1>Re<span>Wise</span></h1>
-                <p>Learning with Flashcards</p>
-            </div>
-        </header>
+   <main id="main-app" class="app-container" style="display:none;">
+    <header class="header">
+        <div class="user-profile" onclick="toggleLogoutMenu()" style="cursor: pointer;">
+          <div id="user-initial" class="user-initial">?</div>
+            <div id="logout-menu" class="logout-dropdown hidden">
+        <p id="full-username"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+
+        <div class="brand">
+            <h1>Re<span>Wise</span></h1>
+            <p>Learning with Flashcards</p>
+        </div>
+
+        <div style="width: 40px;"></div> 
+    </header>
+        
 
         <div class="search-container">
             <i class="fa-solid fa-magnifying-glass"></i>
