@@ -48,11 +48,11 @@
 
         <div class="search-container">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="search-bar" placeholder="Search">
+            <input type="text" id="search-input" placeholder="Search cards..." oninput="filterCards()">
         </div>
 
         <div class="mode-selector">
-            <button id="btn-s" class="mode-btn" onclick="setView('study')">Study mode</button>
+            <button id="btn-s" class="mode-btn" onclick="setView('study')">Practice mode</button>
             <button id="btn-c" class="mode-btn active" onclick="setView('create')">Create Mode</button>
         </div>
 

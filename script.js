@@ -2,6 +2,7 @@ const URL = 'http://localhost:3000/api';
 let editingId = null;
 let deletingId = null;
 let currentUser = null;
+let allCards = []; 
 
 function toggleAuth() {
     const isLoginVisible = document.getElementById('login-form').style.display !== 'none';
@@ -81,29 +82,35 @@ function setView(mode) {
 async function loadCards() {
     try {
         const res = await fetch(`${URL}/cards?user=${currentUser}`);
-        const cards = await res.json();
-        
-        const grid = document.getElementById('card-grid');
-        grid.innerHTML = cards.map(c => `
-            <div class="card card-${c.c}" onclick="this.classList.toggle('flipped')">
-                <div class="face front">${c.q}</div>
-                <div class="face back"><span>${c.a}</span></div>
-            </div>
-        `).join('');
-
-        const list = document.getElementById('card-list');
-        list.innerHTML = cards.map(c => `
-            <div class="list-row">
-                <div class="row-item">Question: ${c.q}</div>
-                <div class="row-item">Answer: ${c.a}</div>
-                <div class="row-item"><span class="dot dot-${c.c}"></span>${c.t || 'General'}</div>
-                <div class="row-item">
-                    <i class="fa-regular fa-pen-to-square edit-icon" onclick="openEdit('${c._id}', '${c.q}', '${c.a}', '${c.t}')"></i>
-                    <i class="fa-solid fa-trash delete-icon" onclick="openDelete('${c._id}')"></i>
-                </div>
-            </div>
-        `).join('');
+        allCards = await res.json(); // Store the data globally
+        renderCards(allCards);       // Display the data
     } catch (e) { console.error(e); }
+}
+
+// This function handles all the HTML display logic
+function renderCards(cardsToDisplay) {
+    // 1. Update Grid View
+    const grid = document.getElementById('card-grid');
+    grid.innerHTML = cardsToDisplay.map(c => `
+        <div class="card card-${c.c}" onclick="this.classList.toggle('flipped')">
+            <div class="face front">${c.q}</div>
+            <div class="face back"><span>${c.a}</span></div>
+        </div>
+    `).join('');
+
+    // 2. Update List View
+    const list = document.getElementById('card-list');
+    list.innerHTML = cardsToDisplay.map(c => `
+        <div class="list-row">
+            <div class="row-item">Question: ${c.q}</div>
+            <div class="row-item">Answer: ${c.a}</div>
+            <div class="row-item"><span class="dot dot-${c.c}"></span>${c.t || 'General'}</div>
+            <div class="row-item">
+                <i class="fa-regular fa-pen-to-square edit-icon" onclick="openEdit('${c._id}', '${c.q}', '${c.a}', '${c.t}')"></i>
+                <i class="fa-solid fa-trash delete-icon" onclick="openDelete('${c._id}')"></i>
+            </div>
+        </div>
+    `).join('');
 }
 
 async function addCard() {
@@ -114,19 +121,26 @@ async function addCard() {
     
     if (!q || !a) return alert("Fill in fields");
 
-    await fetch(`${URL}/cards`, {
+    // 1. Capture the response from the server (it contains the new card with its MongoDB _id)
+    const res = await fetch(`${URL}/cards`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ q, a, c, t, user: currentUser }) 
     });
-
-    loadCards();
     
+    const newCard = await res.json(); // Parse the new card data
+
+    // 2. Add the new card directly to the TOP of your local array
+    allCards.unshift(newCard);
+
+    // 3. Re-render instantly without making an extra network request
+    renderCards(allCards);
+    
+    // Clear inputs
     document.getElementById('in-q').value = '';
     document.getElementById('in-a').value = '';
     document.getElementById('in-t').value = '';
 }
-
 function openEdit(id, q, a, t) {
     editingId = id;
     document.getElementById('edit-q').value = q;
@@ -157,6 +171,19 @@ async function confirmDelete() {
     await fetch(`${URL}/cards/${deletingId}`, { method: 'DELETE' });
     closeModal('delete-modal');
     loadCards();
+}
+
+function filterCards() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    
+    const filtered = allCards.filter(card => {
+        // We use || (OR) so that if it matches the Question OR Answer OR Tag, it shows up
+        return card.q.toLowerCase().includes(query) || 
+               card.a.toLowerCase().includes(query) || 
+               (card.t && card.t.toLowerCase().includes(query)); // Check if tag exists first
+    });
+
+    renderCards(filtered);
 }
 
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }

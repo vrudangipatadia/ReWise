@@ -24,7 +24,7 @@ body {
 
 .user-profile { position: relative; z-index: 10; cursor: pointer; display: inline-block; }
 
-.user-initial { width: 40px; height: 40px; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+.user-initial { width: 50px; height: 50px; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
 
 .user-initial:hover { transform: scale(1.05); }
 
@@ -61,7 +61,7 @@ body {
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
 .card { 
-    height: 260px; /* Taller to prevent image clipping */
+    height: 258px; 
     position: relative; 
     transform-style: preserve-3d; 
     transition: 0.6s; 
@@ -89,13 +89,13 @@ body {
     border-radius: 24px; 
     color: white; 
     text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
-    background: transparent !important; /* Shows card background image */
+    background: transparent !important; /* Shows card's background gradiant */
 }
 
 .back { 
     transform: rotateY(180deg); 
-    background-color: rgba(0, 0, 0, 0.6) !important; /* Tint overlay */
-    backdrop-filter: blur(8px); /* Sleek glass look */
+    background-color: rgba(27, 27, 27, 0.6) !important; /* Tint overlay */
+    /*backdrop-filter: blur(8px);*/ /* Improved UI by removing blurred glass look */
 }
 
 /* Card Color Assignments */

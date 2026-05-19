@@ -78,15 +78,21 @@ app.post('/api/login', async (req, res) => {
 
 // GET ALL (Filtered by User)
 app.get('/api/cards', async (req, res) => {
-    const { user } = req.query; 
-    
-    if (!user) {
-        return res.json([]); // Return empty if no user is logged in
-    }
+    try {
+        const { user } = req.query; 
+        
+        if (!user) {
+            return res.json([]); // Return empty if no user is logged in
+        }
 
-    // Only finds cards where the 'user' field matches the logged-in username
-    const userCards = await Card.find({ user: user }); 
-    res.json(userCards);
+        // Added .sort({ _id: -1 }) to flip the database order (Newest first)
+        const userCards = await Card.find({ user: user }).sort({ _id: -1 }); 
+        res.json(userCards);
+        
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: "Server error sorting cards" });
+    }
 });
 
 // CREATE
